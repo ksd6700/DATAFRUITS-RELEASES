@@ -458,7 +458,7 @@ async function renderIndex(requestUrl) {
   const html = template
     .replace('<p id="resultsMeta">Waiting for TSV rows.</p>', `<p id="resultsMeta">${escapeHtml(resultText)}</p>`)
     .replace('<section id="releaseGrid" class="release-grid" aria-label="release list"></section>', `<section id="releaseGrid" class="release-grid" aria-label="release list">${releaseCards}</section>`)
-    .replace('<script type="module" src="./app.js"></script>', `${ssrScript}\n    <script type="module" src="./app.js"></script>`)
+    .replace('<script type="module" src="./app.js?v=wiki-parallax-depth"></script>', `${ssrScript}\n    <script type="module" src="./app.js?v=wiki-parallax-depth"></script>`)
     .replace("</head>", `${itemListScript}\n  </head>`);
 
   pageCache.set(cacheKey, { createdAt: Date.now(), html });

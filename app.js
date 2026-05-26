@@ -427,8 +427,10 @@ function shuffle(values) {
 
 function createWikiGifLayout(index) {
   const zone = WIKI_GIF_ZONES[index % WIKI_GIF_ZONES.length];
+  const depthDirection = index % 3 === 0 ? -1 : 1;
   return {
-    depth: randomBetween(-0.08, 0.16),
+    depthX: randomBetween(-0.08, 0.08),
+    depthY: randomBetween(0.12, 0.34) * depthDirection,
     left: randomBetween(zone.x[0], zone.x[1]),
     rotate: `${randomBetween(-14, 14).toFixed(2)}deg`,
     size: Math.round(randomBetween(54, 106)),
@@ -455,7 +457,8 @@ function renderWikiGifDecorations() {
     return `
       <span
         class="wiki-gif-sprite"
-        data-depth="${layout.depth}"
+        data-depth-x="${layout.depthX.toFixed(3)}"
+        data-depth-y="${layout.depthY.toFixed(3)}"
         data-rotate="${escapeHtml(layout.rotate)}"
         style="${escapeHtml(getWikiGifStyle(layout))}"
       >
@@ -468,11 +471,21 @@ function renderWikiGifDecorations() {
 
 function updateWikiGifParallax() {
   if (!elements.wikiGifDecorations) return;
-  const scrollY = window.scrollY || 0;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    elements.wikiGifDecorations.querySelectorAll(".wiki-gif-sprite").forEach((sprite) => {
+      sprite.style.transform = "";
+    });
+    return;
+  }
+
+  const masthead = elements.wikiGifDecorations.closest(".masthead");
+  const scrollY = Math.max(window.scrollY || 0, 0);
+  const travel = Math.min(scrollY, (masthead?.offsetHeight || 260) + 160);
   elements.wikiGifDecorations.querySelectorAll(".wiki-gif-sprite").forEach((sprite) => {
-    const depth = Number(sprite.dataset.depth || 0);
+    const depthX = Number(sprite.dataset.depthX || 0);
+    const depthY = Number(sprite.dataset.depthY || 0);
     const rotate = sprite.dataset.rotate || "0deg";
-    sprite.style.transform = `translate3d(0, ${scrollY * depth}px, 0) rotate(${rotate})`;
+    sprite.style.transform = `translate3d(${(travel * depthX).toFixed(2)}px, ${(travel * depthY).toFixed(2)}px, 0) rotate(${rotate})`;
   });
 }
 
