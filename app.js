@@ -653,6 +653,34 @@ function render() {
   updateLoadSentinel(filtered.length);
 }
 
+function getSsrState() {
+  if (window.__DATAFRUITS_SSR__) return window.__DATAFRUITS_SSR__;
+
+  const dataNode = document.querySelector("#ssrReleaseData");
+  if (!dataNode?.textContent) return undefined;
+
+  try {
+    return JSON.parse(dataNode.textContent);
+  } catch {
+    return undefined;
+  }
+}
+
+function applySsrState() {
+  const ssr = getSsrState();
+  if (!ssr || !Array.isArray(ssr.releases)) return false;
+
+  state.source = ssr.source || state.source;
+  state.headers = Array.isArray(ssr.headers) ? ssr.headers : [];
+  state.releases = ssr.releases;
+  state.loadedRows = Number(ssr.loadedRows) || ssr.releases.length;
+  state.renderLimit = Math.max(INITIAL_RENDER_COUNT, Math.min(Number(ssr.renderLimit) || ssr.releases.length, ssr.releases.length));
+  state.isLoading = false;
+  setStatus(`SSR loaded ${formatRefreshTime()}`);
+  render();
+  return true;
+}
+
 async function readTsvStream(response, onRecord) {
   const parser = createTsvParser(onRecord);
 
@@ -918,5 +946,10 @@ setupMobileToolbarAutoHide();
 setupWikiGifDecorations();
 startAutoRefresh();
 setView(state.view === "list" ? "list" : "grid");
-loadSource(state.source);
+const hasSsrState = applySsrState();
+if (hasSsrState) {
+  loadSource(state.source, { background: true, preserveRenderLimit: true });
+} else {
+  loadSource(state.source);
+}
 loadArtistsSource();

@@ -1,14 +1,30 @@
 # DATAFRUITS RELEASES TSV site
 
-Static prototype for `https://releases.datafruits.fm/`.
+Node.js SSR catalog for `https://releases.datafruits.fm/`.
 
 ## Run locally
+
+SSR mode:
+
+```sh
+node server.js
+```
+
+Open `http://127.0.0.1:8000/`.
+
+Static fallback mode:
 
 ```sh
 python3 -m http.server 8000
 ```
 
 Open `http://127.0.0.1:8000/`.
+
+## SEO and SSR
+
+`server.js` fetches the Google Sheets TSV on the server, renders release cards into the first HTML response, and injects the same normalized release data for `app.js` to hydrate. This avoids an empty client-only catalog for crawlers while preserving search, filtering, lazy rendering, hover effects, and 60-second refreshes in the browser.
+
+If the spreadsheet fetch fails at render time, the server falls back to `data/releases.sample.tsv` instead of serving an empty page.
 
 ## Spreadsheet feed
 
@@ -24,6 +40,15 @@ or set this in `index.html`:
 <script>
   window.DATAFRUITS_TSV_URL = "https://docs.google.com/spreadsheets/d/.../edit?gid=0#gid=0";
 </script>
+```
+
+For production SSR, the same feed can also be configured with environment variables:
+
+```sh
+DATAFRUITS_TSV_URL="https://docs.google.com/spreadsheets/d/.../edit?gid=0#gid=0" \
+PUBLIC_ORIGIN="https://releases.datafruits.fm" \
+PORT=8000 \
+node server.js
 ```
 
 Recommended columns:

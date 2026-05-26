@@ -1,0 +1,13 @@
+{
+  "name": "datafruits-releases",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SSR DATAFRUITS releases catalog backed by a Google Sheets TSV feed.",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  }
+}
