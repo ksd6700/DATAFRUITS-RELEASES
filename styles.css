@@ -424,15 +424,14 @@ h1 {
   height: 100%;
   object-fit: cover;
   object-position: center;
-  transition: transform 760ms cubic-bezier(0.65, 0, 0.18, 1);
+  transform: scale(1);
+  transition: transform 420ms cubic-bezier(0.2, 0.8, 0.2, 1);
   will-change: transform;
 }
 
 .cover-link:hover .cover-wrap img,
-.cover-static:hover .cover-wrap img,
-.cover-link.is-cover-hover .cover-wrap img,
-.cover-static.is-cover-hover .cover-wrap img {
-  transform: scale(1.12);
+.cover-static:hover .cover-wrap img {
+  animation: cover-zoom-loop 2.8s cubic-bezier(0.65, 0, 0.18, 1) infinite;
 }
 
 .cover-wrap img + .cover-fallback {
@@ -449,15 +448,28 @@ h1 {
   background:
     linear-gradient(135deg, hsl(var(--cover-hue) 90% 56%), #0b82bd 72%),
     #0b82bd;
-  transition: transform 760ms cubic-bezier(0.65, 0, 0.18, 1);
+  transform: scale(1);
+  transition: transform 420ms cubic-bezier(0.2, 0.8, 0.2, 1);
   will-change: transform;
 }
 
 .cover-link:hover .cover-fallback,
-.cover-static:hover .cover-fallback,
-.cover-link.is-cover-hover .cover-fallback,
-.cover-static.is-cover-hover .cover-fallback {
-  transform: scale(1.12);
+.cover-static:hover .cover-fallback {
+  animation: cover-zoom-loop 2.8s cubic-bezier(0.65, 0, 0.18, 1) infinite;
+}
+
+@keyframes cover-zoom-loop {
+  0% {
+    transform: scale(1);
+  }
+
+  48% {
+    transform: scale(1.12);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 .cover-fallback::before {

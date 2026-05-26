@@ -860,22 +860,6 @@ function setupLazyRender() {
   loadObserver.observe(elements.loadSentinel);
 }
 
-function setupCoverZoom() {
-  if (!window.matchMedia("(hover: hover)").matches) return;
-
-  elements.releaseGrid.addEventListener("pointermove", (event) => {
-    const cover = event.target.closest(".cover-link, .cover-static");
-    if (!cover || !elements.releaseGrid.contains(cover)) return;
-    cover.classList.add("is-cover-hover");
-  });
-
-  elements.releaseGrid.addEventListener("pointerout", (event) => {
-    const cover = event.target.closest(".cover-link, .cover-static");
-    if (!cover || (event.relatedTarget && cover.contains(event.relatedTarget))) return;
-    cover.classList.remove("is-cover-hover");
-  });
-}
-
 function setupMobileToolbarAutoHide() {
   const toolbar = elements.toolbar;
   if (!toolbar) return;
@@ -941,7 +925,6 @@ function startAutoRefresh() {
 
 setupEvents();
 setupLazyRender();
-setupCoverZoom();
 setupMobileToolbarAutoHide();
 setupWikiGifDecorations();
 startAutoRefresh();
