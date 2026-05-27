@@ -511,7 +511,14 @@ const server = http.createServer(async (request, response) => {
   }
 });
 
-server.listen(parsePort(), () => {
-  const address = server.address();
-  console.log(`DATAFRUITS RELEASES SSR listening on http://127.0.0.1:${address.port}/`);
-});
+if (require.main === module) {
+  server.listen(parsePort(), () => {
+    const address = server.address();
+    console.log(`DATAFRUITS RELEASES SSR listening on http://127.0.0.1:${address.port}/`);
+  });
+}
+
+module.exports = {
+  DEFAULT_TSV_URL,
+  renderIndex,
+};

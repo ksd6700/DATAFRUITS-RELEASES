@@ -4,6 +4,14 @@ Node.js SSR catalog for `https://releases.datafruits.fm/`.
 
 ## Run locally
 
+Build the static site:
+
+```sh
+npm run build:ssg
+```
+
+The generated site is written to `dist/`.
+
 SSR mode:
 
 ```sh
@@ -25,6 +33,18 @@ Open `http://127.0.0.1:8000/`.
 `server.js` fetches the Google Sheets TSV on the server, renders release cards into the first HTML response, and injects the same normalized release data for `app.js` to hydrate. This avoids an empty client-only catalog for crawlers while preserving search, filtering, lazy rendering, hover effects, and 60-second refreshes in the browser.
 
 If the spreadsheet fetch fails at render time, the server falls back to `data/releases.sample.tsv` instead of serving an empty page.
+
+## Static generation
+
+`npm run build:ssg` uses the same server-side renderer to write `dist/index.html` with the current spreadsheet data already embedded. The browser still checks the spreadsheet every 60 seconds after load, so visitors can see fresh sheet updates even if the generated HTML is from the last build.
+
+`.github/workflows/deploy-ssg.yml` builds and deploys `dist/` to GitHub Pages:
+
+- automatically on pushes to `main`
+- hourly via GitHub Actions schedule
+- manually from the workflow's **Run workflow** button
+
+Set GitHub Pages to use **GitHub Actions** as the source. The build writes `dist/CNAME` as `releases.datafruits.fm`; override that with `PAGES_CNAME` if needed.
 
 ## Spreadsheet feed
 
