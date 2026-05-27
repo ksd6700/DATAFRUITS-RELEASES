@@ -881,11 +881,17 @@ function setupMobileToolbarAutoHide() {
   let lastScrollY = window.scrollY;
   let ticking = false;
 
+  function syncToolbarCollapseHeight() {
+    const height = toolbar.getBoundingClientRect().height;
+    toolbar.style.setProperty("--toolbar-collapse-height", `${Math.ceil(height)}px`);
+  }
+
   function showToolbar() {
     toolbar.classList.remove("is-sp-hidden");
   }
 
   function updateToolbar() {
+    syncToolbarCollapseHeight();
     const currentScrollY = window.scrollY;
     const delta = currentScrollY - lastScrollY;
     const focusedInside = toolbar.contains(document.activeElement);
@@ -910,13 +916,19 @@ function setupMobileToolbarAutoHide() {
   }
 
   function handleMediaChange() {
+    syncToolbarCollapseHeight();
     showToolbar();
     lastScrollY = window.scrollY;
   }
 
+  syncToolbarCollapseHeight();
   window.addEventListener("scroll", scheduleToolbarUpdate, { passive: true });
   window.addEventListener("resize", scheduleToolbarUpdate);
   toolbar.addEventListener("focusin", showToolbar);
+
+  if ("ResizeObserver" in window) {
+    new ResizeObserver(syncToolbarCollapseHeight).observe(toolbar);
+  }
 
   if (mobileQuery.addEventListener) {
     mobileQuery.addEventListener("change", handleMediaChange);
