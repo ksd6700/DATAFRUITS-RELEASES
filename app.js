@@ -879,6 +879,7 @@ function setupMobileToolbarAutoHide() {
 
   const mobileQuery = window.matchMedia("(max-width: 620px)");
   let lastScrollY = window.scrollY;
+  let ignoreScrollUntil = 0;
   let ticking = false;
 
   function syncToolbarCollapseHeight() {
@@ -886,8 +887,14 @@ function setupMobileToolbarAutoHide() {
     toolbar.style.setProperty("--toolbar-collapse-height", `${Math.ceil(height)}px`);
   }
 
+  function setToolbarHidden(hidden) {
+    if (toolbar.classList.contains("is-sp-hidden") === hidden) return;
+    toolbar.classList.toggle("is-sp-hidden", hidden);
+    ignoreScrollUntil = performance.now() + 260;
+  }
+
   function showToolbar() {
-    toolbar.classList.remove("is-sp-hidden");
+    setToolbarHidden(false);
   }
 
   function updateToolbar() {
@@ -899,8 +906,12 @@ function setupMobileToolbarAutoHide() {
 
     if (!mobileQuery.matches || focusedInside || currentScrollY < stickyStart) {
       showToolbar();
+    } else if (performance.now() < ignoreScrollUntil) {
+      lastScrollY = currentScrollY;
+      ticking = false;
+      return;
     } else if (delta > 10) {
-      toolbar.classList.add("is-sp-hidden");
+      setToolbarHidden(true);
     } else if (delta < -8) {
       showToolbar();
     }
