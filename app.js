@@ -873,81 +873,6 @@ function setupLazyRender() {
   loadObserver.observe(elements.loadSentinel);
 }
 
-function setupMobileToolbarAutoHide() {
-  const toolbar = elements.toolbar;
-  if (!toolbar) return;
-
-  const mobileQuery = window.matchMedia("(max-width: 620px)");
-  let lastScrollY = window.scrollY;
-  let ignoreScrollUntil = 0;
-  let ticking = false;
-
-  function syncToolbarCollapseHeight() {
-    const height = toolbar.getBoundingClientRect().height;
-    toolbar.style.setProperty("--toolbar-collapse-height", `${Math.ceil(height)}px`);
-  }
-
-  function setToolbarHidden(hidden) {
-    if (toolbar.classList.contains("is-sp-hidden") === hidden) return;
-    toolbar.classList.toggle("is-sp-hidden", hidden);
-    ignoreScrollUntil = performance.now() + 260;
-  }
-
-  function showToolbar() {
-    setToolbarHidden(false);
-  }
-
-  function updateToolbar() {
-    syncToolbarCollapseHeight();
-    const currentScrollY = window.scrollY;
-    const delta = currentScrollY - lastScrollY;
-    const focusedInside = toolbar.contains(document.activeElement);
-    const stickyStart = Math.max(120, toolbar.offsetTop - 20);
-
-    if (!mobileQuery.matches || focusedInside || currentScrollY < stickyStart) {
-      showToolbar();
-    } else if (performance.now() < ignoreScrollUntil) {
-      lastScrollY = currentScrollY;
-      ticking = false;
-      return;
-    } else if (delta > 10) {
-      setToolbarHidden(true);
-    } else if (delta < -8) {
-      showToolbar();
-    }
-
-    lastScrollY = currentScrollY;
-    ticking = false;
-  }
-
-  function scheduleToolbarUpdate() {
-    if (ticking) return;
-    window.requestAnimationFrame(updateToolbar);
-    ticking = true;
-  }
-
-  function handleMediaChange() {
-    syncToolbarCollapseHeight();
-    showToolbar();
-    lastScrollY = window.scrollY;
-  }
-
-  syncToolbarCollapseHeight();
-  window.addEventListener("scroll", scheduleToolbarUpdate, { passive: true });
-  window.addEventListener("resize", scheduleToolbarUpdate);
-  toolbar.addEventListener("focusin", showToolbar);
-
-  if ("ResizeObserver" in window) {
-    new ResizeObserver(syncToolbarCollapseHeight).observe(toolbar);
-  }
-
-  if (mobileQuery.addEventListener) {
-    mobileQuery.addEventListener("change", handleMediaChange);
-  } else {
-    mobileQuery.addListener(handleMediaChange);
-  }
-}
-
 function startAutoRefresh() {
   if (autoRefreshTimer) {
     window.clearInterval(autoRefreshTimer);
@@ -961,7 +886,6 @@ function startAutoRefresh() {
 
 setupEvents();
 setupLazyRender();
-setupMobileToolbarAutoHide();
 setupWikiGifDecorations();
 startAutoRefresh();
 setView(state.view === "list" ? "list" : "grid");
